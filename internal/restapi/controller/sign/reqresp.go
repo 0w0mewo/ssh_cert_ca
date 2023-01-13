@@ -2,7 +2,6 @@ package sign
 
 import (
 	"strings"
-	"time"
 
 	"github.com/0w0mewo/ssh_cert_ca/internal/model"
 	"github.com/0w0mewo/ssh_cert_ca/internal/restapi/controller"
@@ -23,8 +22,9 @@ func (srq *SignRequest) Validate() error {
 		return errInvalidInput
 	}
 
-	if srq.TTL == 0 {
-		srq.TTL = uint64(8 * time.Hour)
+	// default of 8 hours
+	if srq.TTL <= 0 || srq.TTL > (24*365*100*3600) {
+		srq.TTL = uint64(24 * 365 * 1 * 3600)
 	}
 
 	return nil

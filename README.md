@@ -25,7 +25,8 @@ curl -X GET -H "Authorization: Bearer <token>" "http://<ca server address>/ca/ca
  
 
 ### Notes:
-- The default TTL of host and user public key is 8 hours.
+- The default TTL of host and user public key is 1 year.
+- TTL is in unit of seconds.
 
 ### Quick Start
 

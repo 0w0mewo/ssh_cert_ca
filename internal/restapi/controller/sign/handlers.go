@@ -127,7 +127,7 @@ func (r *Router) Sign(c *fiber.Ctx) error {
 	}
 
 	// sign
-	cert, err := signer.Sign(pubkey, uuid.NewString(), req.SplitedSignTo(), time.Duration(req.TTL))
+	cert, err := signer.Sign(pubkey, uuid.NewString(), req.SplitedSignTo(), time.Duration(req.TTL)*time.Second)
 	if err != nil {
 		return err
 	}
