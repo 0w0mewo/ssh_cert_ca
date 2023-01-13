@@ -1,6 +1,8 @@
 package cert
 
 import (
+	"time"
+
 	"github.com/0w0mewo/ssh_cert_ca/internal/model"
 	"github.com/jmoiron/sqlx"
 	_ "modernc.org/sqlite"
@@ -10,6 +12,7 @@ type stmts struct {
 	createCert               *sqlx.Stmt
 	getAllCertsByRole        *sqlx.Stmt
 	getAllRevokedCertsByRole *sqlx.Stmt
+	getAllExpiredCertsByRole *sqlx.Stmt
 	updateRevoked            *sqlx.Stmt
 }
 
@@ -32,6 +35,11 @@ func prepareStmts(db *sqlx.DB) (stmt *stmts, err error) {
 	}
 
 	stmt.getAllRevokedCertsByRole, err = db.Preparex("SELECT * FROM certs WHERE type = ? AND revoked = 1")
+	if err != nil {
+		return
+	}
+
+	stmt.getAllExpiredCertsByRole, err = db.Preparex("SELECT * FROM certs WHERE type = ? AND revoked = 0 AND valid_end < ?")
 	if err != nil {
 		return
 	}
@@ -116,4 +124,18 @@ func (ss *SqlStore) GetRevokedCertByRole(role model.RoleType) ([]*model.Cert, er
 	}
 
 	return res, nil
+}
+
+func (ss *SqlStore) GetExpiredCertsByRole(role model.RoleType) ([]*model.Cert, error) {
+	res := make([]*model.Cert, 0)
+	err := ss.preparedStmts.getAllExpiredCertsByRole.Select(&res, role, time.Now())
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (ss *SqlStore) Close() error {
+	return ss.db.Close()
 }

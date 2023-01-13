@@ -37,7 +37,7 @@ type RevokeRequest struct {
 }
 
 func (rr RevokeRequest) Validate() error {
-	if rr.Role == "" || rr.KeyId == "" {
+	if rr.Role == "" {
 		return errInvalidInput
 	}
 

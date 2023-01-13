@@ -7,14 +7,16 @@ import (
 	"github.com/0w0mewo/ssh_cert_ca/internal/model"
 	"github.com/0w0mewo/ssh_cert_ca/pkg/ca"
 	"github.com/0w0mewo/ssh_cert_ca/pkg/repo/cert"
+	"github.com/0w0mewo/ssh_cert_ca/pkg/utils"
 	"golang.org/x/crypto/ssh"
 )
 
 type SSHCertCAService struct {
-	certStore cert.CertRepo
-	kepair    *ca.CAKeyPairs
-	role      model.RoleType
-	cachedKRL []byte
+	certStore  cert.CertRepo
+	kepair     *ca.CAKeyPairs
+	role       model.RoleType
+	revokeTask *utils.ScheduledTaskGroup
+	cachedKRL  []byte
 }
 
 func NewSSHCertCAService(dbdriver, dsn string, privKeyFile, passparse string, role model.RoleType) (*SSHCertCAService, error) {
@@ -24,12 +26,17 @@ func NewSSHCertCAService(dbdriver, dsn string, privKeyFile, passparse string, ro
 	}
 
 	ret := &SSHCertCAService{
-		certStore: cert.NewCertRepo(dbdriver, dsn),
-		kepair:    kp,
-		role:      role,
+		certStore:  cert.NewCertRepo(dbdriver, dsn),
+		kepair:     kp,
+		role:       role,
+		revokeTask: utils.NewScheduledTaskGroup("default"),
 	}
 
 	ret.regenerateRevokedList()
+
+	ret.revokeTask.AddPerodical(1*time.Minute, func() error {
+		return ret.taskRevokeExpiredCerts()
+	})
 
 	return ret, nil
 
@@ -82,4 +89,26 @@ func (s *SSHCertCAService) regenerateRevokedList() (err error) {
 
 func (s *SSHCertCAService) GetPresentRevokedListBase64() string {
 	return base64.StdEncoding.EncodeToString(s.cachedKRL)
+}
+
+func (s *SSHCertCAService) Stop() error {
+	s.revokeTask.WaitAndStop()
+	return s.certStore.Close()
+}
+
+func (s *SSHCertCAService) taskRevokeExpiredCerts() error {
+	certs, err := s.certStore.GetExpiredCertsByRole(s.role)
+	if err != nil {
+		return err
+	}
+
+	for _, cert := range certs {
+		err := s.Revoke(cert.KeyId)
+		if err != nil {
+			continue
+		}
+	}
+
+	return nil
+
 }

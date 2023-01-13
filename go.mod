@@ -7,8 +7,10 @@ require (
 	github.com/gofiber/keyauth/v2 v2.1.30
 	github.com/google/uuid v1.3.0
 	github.com/jmoiron/sqlx v1.3.5
+	github.com/sirupsen/logrus v1.9.0
 	github.com/stripe/krl v0.0.0-20220202203423-9dc12b164150
 	golang.org/x/crypto v0.4.0
+	modernc.org/sqlite v1.20.2
 )
 
 require (
@@ -35,7 +37,6 @@ require (
 	modernc.org/mathutil v1.5.0 // indirect
 	modernc.org/memory v1.4.0 // indirect
 	modernc.org/opt v0.1.3 // indirect
-	modernc.org/sqlite v1.20.2 // indirect
 	modernc.org/strutil v1.1.3 // indirect
 	modernc.org/token v1.0.1 // indirect
 )

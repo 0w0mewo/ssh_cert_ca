@@ -75,5 +75,6 @@ func (r *Router) RegisterToPath(attchedTo *fiber.App) {
 }
 
 func (r *Router) Close() {
-
+	r.hostca.Stop()
+	r.userca.Stop()
 }

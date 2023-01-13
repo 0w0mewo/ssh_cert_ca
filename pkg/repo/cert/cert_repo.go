@@ -9,6 +9,8 @@ type CertRepo interface {
 	UpdateRevoke(certId string, revoked bool) error
 	GetCertsByRole(role model.RoleType) ([]*model.Cert, error)
 	GetRevokedCertByRole(role model.RoleType) ([]*model.Cert, error)
+	GetExpiredCertsByRole(role model.RoleType) ([]*model.Cert, error)
+	Close() error
 }
 
 func NewCertRepo(driver, dsn string) CertRepo {

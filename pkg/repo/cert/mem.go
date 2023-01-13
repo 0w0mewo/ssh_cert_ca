@@ -2,6 +2,7 @@ package cert
 
 import (
 	"sync"
+	"time"
 
 	"github.com/0w0mewo/ssh_cert_ca/internal/model"
 	"github.com/0w0mewo/ssh_cert_ca/pkg/repo"
@@ -73,4 +74,25 @@ func (m *MemStore) GetRevokedCertByRole(role model.RoleType) ([]*model.Cert, err
 	}
 
 	return res, nil
+}
+
+func (m *MemStore) GetExpiredCertsByRole(role model.RoleType) ([]*model.Cert, error) {
+	certs, err := m.GetCertsByRole(role)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]*model.Cert, 0)
+
+	for _, c := range certs {
+		if !c.Revoked && c.ValidEnd.After(time.Now()){
+			res = append(res, c)
+		}
+	}
+
+	return res, nil
+}
+
+func (m *MemStore) Close() error {
+	return nil
 }

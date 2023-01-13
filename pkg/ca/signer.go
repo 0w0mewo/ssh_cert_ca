@@ -104,9 +104,11 @@ func (ckp *CAKeyPairs) Sign(pubkeyToSign ssh.PublicKey, keyid string, serial uin
 
 	if isHost {
 		certType = ssh.HostCert
+		c.Type = model.CertTypeHost
 		principals = append(principals, validPrincipals...)
 	} else {
 		certType = ssh.UserCert
+		c.Type = model.CerTypeUser
 		principals = append(principals, validPrincipals[0])
 	}
 
