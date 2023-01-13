@@ -22,7 +22,27 @@ curl -X GET -H "Authorization: Bearer <token>" "http://<ca server address>/ca/ca
 ```
 curl -X GET -H "Authorization: Bearer <token>" "http://<ca server address>/ca/capubkey/user" 
 ``` 
- 
+
+- To revoke user certificate
+```
+curl -X DELETE -H "Authorization: Bearer <token>" "http://<ca server address>/ca/revoke/user/<key id>"
+```
+
+- To revoke host certificate
+```
+curl -X DELETE -H "Authorization: Bearer <token>" "http://<ca server address>/ca/revoke/host/<key id>"
+```
+
+- To get host KRL
+```
+curl -X GET -H "Authorization: Bearer <token>" "http://<ca server address>/ca/getrevoked/host"
+```
+
+- To get user KRL
+```
+curl -X GET -H "Authorization: Bearer <token>" "http://<ca server address>/ca/getrevoked/user"
+```
+
 
 ### Notes:
 - The default TTL of host and user public key is 1 year.
