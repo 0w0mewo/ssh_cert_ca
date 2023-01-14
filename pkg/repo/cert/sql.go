@@ -34,12 +34,12 @@ func prepareStmts(db *sqlx.DB) (stmt *stmts, err error) {
 		return
 	}
 
-	stmt.getAllRevokedCertsByRole, err = db.Preparex("SELECT * FROM certs WHERE type = ? AND revoked = 1")
+	stmt.getAllRevokedCertsByRole, err = db.Preparex("SELECT keyid FROM certs WHERE type = ? AND revoked = 1")
 	if err != nil {
 		return
 	}
 
-	stmt.getAllExpiredCertsByRole, err = db.Preparex("SELECT * FROM certs WHERE type = ? AND revoked = 0 AND valid_end < ?")
+	stmt.getAllExpiredCertsByRole, err = db.Preparex("SELECT keyid FROM certs WHERE type = ? AND revoked = 0 AND valid_end < ?")
 	if err != nil {
 		return
 	}
@@ -116,18 +116,18 @@ func (ss *SqlStore) GetCertsByRole(role model.RoleType) ([]*model.Cert, error) {
 	return res, nil
 }
 
-func (ss *SqlStore) GetRevokedCertByRole(role model.RoleType) ([]*model.Cert, error) {
-	res := make([]*model.Cert, 0)
+func (ss *SqlStore) GetRevokedCertIdsByRole(role model.RoleType) ([]string, error) {
+	res := make([]string, 0)
 	err := ss.preparedStmts.getAllRevokedCertsByRole.Select(&res, role)
 	if err != nil {
 		return nil, err
 	}
-
+	
 	return res, nil
 }
 
-func (ss *SqlStore) GetExpiredCertsByRole(role model.RoleType) ([]*model.Cert, error) {
-	res := make([]*model.Cert, 0)
+func (ss *SqlStore) GetExpiredCertIdsByRole(role model.RoleType) ([]string, error) {
+	res := make([]string, 0)
 	err := ss.preparedStmts.getAllExpiredCertsByRole.Select(&res, role, time.Now())
 	if err != nil {
 		return nil, err

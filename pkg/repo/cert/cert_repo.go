@@ -8,8 +8,9 @@ type CertRepo interface {
 	CreateCert(cert model.Cert) error
 	UpdateRevoke(certId string, revoked bool) error
 	GetCertsByRole(role model.RoleType) ([]*model.Cert, error)
-	GetRevokedCertByRole(role model.RoleType) ([]*model.Cert, error)
-	GetExpiredCertsByRole(role model.RoleType) ([]*model.Cert, error)
+	// GetCertsById(id string) ([]*model.Cert, error)
+	GetRevokedCertIdsByRole(role model.RoleType) ([]string, error)
+	GetExpiredCertIdsByRole(role model.RoleType) ([]string, error)
 	Close() error
 }
 

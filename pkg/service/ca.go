@@ -74,7 +74,7 @@ func (s *SSHCertCAService) Revoke(keyid string) error {
 }
 
 func (s *SSHCertCAService) regenerateRevokedList() (err error) {
-	certs, err := s.certStore.GetRevokedCertByRole(s.role)
+	certs, err := s.certStore.GetRevokedCertIdsByRole(s.role)
 	if err != nil {
 		return
 	}
@@ -97,13 +97,13 @@ func (s *SSHCertCAService) Stop() error {
 }
 
 func (s *SSHCertCAService) taskRevokeExpiredCerts() error {
-	certs, err := s.certStore.GetExpiredCertsByRole(s.role)
+	certIds, err := s.certStore.GetExpiredCertIdsByRole(s.role)
 	if err != nil {
 		return err
 	}
 
-	for _, cert := range certs {
-		err := s.Revoke(cert.KeyId)
+	for _, id := range certIds {
+		err := s.Revoke(id)
 		if err != nil {
 			continue
 		}

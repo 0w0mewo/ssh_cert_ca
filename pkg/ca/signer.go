@@ -146,16 +146,15 @@ func (ckp *CAKeyPairs) Sign(pubkeyToSign ssh.PublicKey, keyid string, serial uin
 	return
 }
 
-func (ckp *CAKeyPairs) GenerateRevokedList(certs ...*model.Cert) ([]byte, error) {
+func (ckp *CAKeyPairs) GenerateRevokedList(certIds ...string) ([]byte, error) {
 	reovkedCerts := &krl.KRLCertificateSection{
 		CA: ckp.pubkey,
 	}
 
 	ids := krl.KRLCertificateKeyID{}
-	for _, cert := range certs {
-		if cert.Revoked {
-			ids = append(ids, cert.KeyId)
-		}
+	for _, id := range certIds {
+		ids = append(ids, id)
+
 	}
 
 	reovkedCerts.Sections = append(reovkedCerts.Sections, &ids)

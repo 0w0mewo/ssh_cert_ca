@@ -59,34 +59,34 @@ func (m *MemStore) GetCertsByRole(role model.RoleType) ([]*model.Cert, error) {
 	return res, nil
 }
 
-func (m *MemStore) GetRevokedCertByRole(role model.RoleType) ([]*model.Cert, error) {
+func (m *MemStore) GetRevokedCertIdsByRole(role model.RoleType) ([]string, error) {
 	certs, err := m.GetCertsByRole(role)
 	if err != nil {
 		return nil, err
 	}
 
-	res := make([]*model.Cert, 0)
+	res := make([]string, 0)
 
 	for _, c := range certs {
 		if c.Revoked {
-			res = append(res, c)
+			res = append(res, c.KeyId)
 		}
 	}
 
 	return res, nil
 }
 
-func (m *MemStore) GetExpiredCertsByRole(role model.RoleType) ([]*model.Cert, error) {
+func (m *MemStore) GetExpiredCertIdsByRole(role model.RoleType) ([]string, error) {
 	certs, err := m.GetCertsByRole(role)
 	if err != nil {
 		return nil, err
 	}
 
-	res := make([]*model.Cert, 0)
+	res := make([]string, 0)
 
 	for _, c := range certs {
-		if !c.Revoked && c.ValidEnd.After(time.Now()){
-			res = append(res, c)
+		if !c.Revoked && c.ValidEnd.After(time.Now()) {
+			res = append(res, c.KeyId)
 		}
 	}
 
